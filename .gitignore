@@ -1,6 +1,6 @@
 *.pyc
 old
-
+.DS_Store
 .quit()
 
 ls
