@@ -1,6 +1,7 @@
 import json
 import urllib2
 import time
+import re
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
@@ -25,14 +26,29 @@ class Scrape:
 		else:
 			return None
 
-	def get_page(self, page_name, num_pages, fields):
+	def get_page(self, page_name, num_pages, fields, limit, sleep_time):
 		'''Get Facebook page info'''
 		access_token = self.fetch_app_access_token('1018392914858570', '72cf8c8a02b6e9315a11d7f0d714841d')
-		url = 'https://graph.facebook.com/{0}/posts?access_token={1}&fields={2}'.format(page_name, access_token, ','.join(fields))
+		url = 'https://graph.facebook.com/{0}/feed?access_token={1}&fields={2}&limit={3}'.format(page_name, access_token, ','.join(fields), limit)
 		print url
 		for page in xrange(0, num_pages):
-			print '\nGETTING PAGE {} DATA...'.format(page+1)
-			data = json.load(urllib2.urlopen(url))
+			print url
+			print '\nGETTING PAGE {} DATA...'.format(page+1)		
+
+			data = None
+			while data is None:
+				try:
+					data = json.load(urllib2.urlopen(url))
+				except KeyboardInterrupt:
+					raise
+				except urllib2.URLError:
+					print "500 ERROR. TRYING AGAIN."
+					pass
+				except:
+					print "ERROR. TRYING AGAIN."
+					pass
+
+				
 
 			for post in data['data']:
 				# Only get Post data if it doesn't already exist in db
@@ -42,19 +58,38 @@ class Scrape:
 					if 'comments' in post.keys():
 						post['comments_count'] = self.get_comments(post['comments'], post['id'], 0)
 
+					post['org_name'] = page_name
+					post['url'] = 'http://facebook.com/' + post['id']
+					
+					# Get hashtags
+					if 'message' in post.keys():
+						hash_info = self.get_hashtags(post['message'])
+						post['hashtags'] = hash_info[0]
+						post['hashtags_count'] = hash_info[1]
+
 					# Write Post to database
 					new_entry = Post(post)
 					self.session.merge(new_entry)
-	
-					# self.print_debug(['id', 'like_count', 'comments_count'], post)
 
-			time.sleep(3)
+			time.sleep(sleep_time)
 			print "Done."
 			url = data['paging']['next']
+
+	def get_hashtags(self, message):
+		p = re.compile(r'#\w+')	
+		matches = p.findall(message)
+		return [', '.join(matches), len(matches)]
 
 	def get_comments(self, comments, parent_id, count):
 		count += len(comments['data'])
 		for comment in comments['data']:
+
+			# Get hashtags
+			if 'message' in comment.keys():
+				hash_info = self.get_hashtags(comment['message'])
+				comment['hashtags'] = hash_info[0]
+				comment['hashtags_count'] = hash_info[1]
+
 			# Write Comment to database
 			new_entry = Comment(comment, parent_id)
 			self.session.merge(new_entry)
@@ -73,11 +108,14 @@ class Scrape:
 		print ''
 
 	def main(self):
-		page_name = 'UnitedWay'
+		page_name = 'feedthechildren'
 		pages = 100
-		fields = ['id', 'created_time', 'shares', 'type', 'likes.summary(true)', 'comments{like_count,message}', 'message']
+		limit = 100
+		sleep_time = 3
+		fields = ['id', 'created_time', 'shares', 'type', 'likes.summary(true)', 
+		             'comments{like_count,message,created_time}', 'message', 'link', 'status_type']
 
-		self.get_page(page_name, pages, fields)
+		self.get_page(page_name, pages, fields, limit, sleep_time)
 
 
 if __name__ == "__main__":

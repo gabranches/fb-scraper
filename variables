@@ -1,0 +1,89 @@
+Org_name
+	org_name
+
+Date_collection # when the data was collected
+	date_collected
+
+FB_org_id  #page id, an unique identifier for a Facebook page.
+	post_id
+
+Location
+
+Link #The URL to a Facebook page post.
+	url
+
+Post_id #Unique identifier for a Facebook page post
+	post_id
+
+Post_content #The textual content of a post
+	message
+
+Type 	#The type of post – status, link, photo, video, etc.
+	type
+
+Published_date  #When a Facebook page post is sent.
+	created_time
+
+Post_type #More detailed status post type  (e.g. mobile_status_update, added_photo)
+	status_type
+
+Picture_source  #The name of the webpage that the included URL is linking to.
+	link
+
+Video_source  #Included URL to a video
+	link
+
+Link_source #Description of the webpage that the included URL is linking to.
+	link
+
+Mentions_count  #The number of mentions in a post.
+	# will add message_tags
+
+Mentions  #The mentioned page/people in a post.
+	# will add all in one column (names)
+
+Hashtags_count 
+	hashtags_count
+
+Hashtags 
+	hashtags
+
+Likes_count 
+	like_count
+
+Shares_count
+	shares
+
+Comments_count 
+	comments_count
+
+Comment_content 
+	message
+
+Comment_published_date  
+	created_date
+
+Comment_time_since_post_days
+	excel
+
+Comment_likes_count 
+	like_count
+
+Comment_person_id
+	# will add (as text)
+
+Comment_mentions_count 
+	# will add
+
+Comment_mentions 
+	# will add
+
+Comment_hashtags_count
+	hashtags_count
+
+Comment_hashtags
+	hashtags
+
+comment_ranking_system 
+	# will add comments.summary(true)
+
