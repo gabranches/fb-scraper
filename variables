@@ -7,7 +7,6 @@ Date_collection # when the data was collected
 FB_org_id  #page id, an unique identifier for a Facebook page.
 	post_id
 
-Location
 
 Link #The URL to a Facebook page post.
 	url
@@ -37,10 +36,10 @@ Link_source #Description of the webpage that the included URL is linking to.
 	link
 
 Mentions_count  #The number of mentions in a post.
-	# will add message_tags
+	mentions_count
 
 Mentions  #The mentioned page/people in a post.
-	# will add all in one column (names)
+	mentions
 
 Hashtags_count 
 	hashtags_count
@@ -64,19 +63,19 @@ Comment_published_date
 	created_date
 
 Comment_time_since_post_days
-	excel
+	# will do in excel
 
 Comment_likes_count 
 	like_count
 
 Comment_person_id
-	# will add (as text)
+	commenter_id
 
 Comment_mentions_count 
-	# will add
+	mentions_count
 
 Comment_mentions 
-	# will add
+	mentions
 
 Comment_hashtags_count
 	hashtags_count
@@ -85,5 +84,5 @@ Comment_hashtags
 	hashtags
 
 comment_ranking_system 
-	# will add comments.summary(true)
+	comment_order
 

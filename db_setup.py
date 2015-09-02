@@ -8,7 +8,6 @@ Base = declarative_base()
 
 class Post(Base):
 	__tablename__ = 'posts'
-
 	post_full_id = Column(String, primary_key=True)
 	post_id = Column(Integer)
 	fb_org_id = Column(Integer)
@@ -23,8 +22,11 @@ class Post(Base):
 	url = Column(String)
 	status_type = Column(String)
 	hashtags = Column(String)
-	hashtags_count = Column(String)
+	hashtags_count = Column(Integer)
 	date_collected = Column(String)
+	mentions = Column(String)
+	mentions_count = Column(Integer)
+	comment_order = Column(String)
 
 	def __init__(self, data):
 		self.post_full_id = data['id'] if 'id' in data else None
@@ -43,11 +45,13 @@ class Post(Base):
 		self.hashtags = data['hashtags'] if 'hashtags' in data else None
 		self.hashtags_count = data['hashtags_count'] if 'hashtags_count' in data else 0
 		self.date_collected = time.strftime("%Y-%m-%d")
+		self.mentions = data['mentions'] if 'mentions' in data else None
+		self.mentions_count = data['mentions_count'] if 'mentions_count' in data else 0
+		self.comment_order =  data['comment_order'] if 'comment_order' in data else None
 
 
 class Comment(Base):
 	__tablename__ = 'comments'
-
 	comment_id = Column(String, primary_key=True)
 	parent_post_full_id = Column(String)
 	message = Column(String)
@@ -55,6 +59,9 @@ class Comment(Base):
 	created_time = Column(String)
 	hashtags = Column(String)
 	hashtags_count = Column(String)
+	commenter_id = Column(Integer)
+	mentions = Column(String)
+	mentions_count = Column(Integer)
 
 	def __init__(self, data, parent_post):
 		self.comment_id = data['id'] if 'id' in data else None
@@ -64,3 +71,6 @@ class Comment(Base):
 		self.created_time = data['created_time'] if 'created_time' in data else None
 		self.hashtags = data['hashtags'] if 'hashtags' in data else None
 		self.hashtags_count = data['hashtags_count'] if 'hashtags_count' in data else 0
+		self.commenter_id = data['from']['id'] if 'from' in data else None
+		self.mentions = data['mentions'] if 'mentions' in data else None
+		self.mentions_count = data['mentions_count'] if 'mentions_count' in data else 0
