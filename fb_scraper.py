@@ -2,6 +2,8 @@ import json
 import urllib2
 import time
 import re
+import datetime
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import exists
@@ -27,10 +29,10 @@ class Scrape:
 		else:
 			return None
 
-	def get_page(self, page_name, fields, limit, sleep_time):
+	def get_page(self, page_name, fields, limit, sleep_time, since, until):
 		'''Get Facebook page info'''
 		access_token = self.fetch_app_access_token('1018392914858570', '72cf8c8a02b6e9315a11d7f0d714841d')
-		url = 'https://graph.facebook.com/{0}/feed?access_token={1}&fields={2}&limit={3}'.format(page_name, access_token, ','.join(fields), limit)
+		url = 'https://graph.facebook.com/{0}/feed?access_token={1}&fields={2}&limit={3}&since={4}&until={5}'.format(page_name, access_token, ','.join(fields), limit, since, until)
 		print url
 		post_num = 1
 		while url is not None:
@@ -85,6 +87,7 @@ class Scrape:
 			if 'paging' in data:
 				url = data['paging']['next']
 				post_num += limit
+				print url
 			else:
 				url = None
 		print "\n Finished downloading data."
@@ -139,15 +142,20 @@ class Scrape:
 				print '{}: {}'.format(arg, post[arg])
 		print ''
 
+	def date_unix(self, s):
+		return time.mktime(datetime.datetime.strptime(s, "%d/%m/%Y").timetuple())
+
 	def main(self):
-		page_name = 'unitedway'
+		page_name = 'FeedingAmerica'
 		limit = 25
 		sleep_time = 3
+		since = '1/1/2011' # dd/mm/yyyy
+		until =  '23/3/2011' # dd/mm/yy
 		fields = ['id', 'created_time', 'shares', 'type', 'likes.summary(true)', 
 		             'comments.summary(true){like_count,message,created_time,from,message_tags}', 'message', 'link', 
 		             'status_type', 'message_tags']
 
-		self.get_page(page_name, fields, limit, sleep_time)
+		self.get_page(page_name, fields, limit, sleep_time, self.date_unix(since), self.date_unix(until))
 
 
 if __name__ == "__main__":
